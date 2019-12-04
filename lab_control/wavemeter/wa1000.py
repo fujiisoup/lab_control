@@ -73,8 +73,6 @@ def get_status(status_string):
     wavelength = float(wavelength)
     display = int(display)
     status = int(status)
-    print(bin(display))
-    print(bin(status))
     display = {k: (display & v) == 1 for k, v in DISPLAY_MASKS.items()}
     status = {k: (status & v) == 1 for k, v in STATUS_MASKS.items()}
     return wavelength, display, status

@@ -1,4 +1,4 @@
-# Control script of wavemeter ***
+# Control script of wavemeter WA-1000
 
 ## Requirement
 
