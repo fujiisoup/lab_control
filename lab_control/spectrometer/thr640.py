@@ -25,14 +25,14 @@ class THR640:
             count = self._wavelength_to_count(wavelength)
 
         while not self._check_ready():
-            self._send_goto_count(count)
+            self._send_goto(count)
             time.sleep(1)
 
     def _check_ready(self):
         """ returns if the spectrometer is ready """
         raise NotImplementedError
 
-    def _send_goto_count(self, count):
+    def _send_goto(self, count):
         """ send a command to go to the specified count """
         raise NotImplementedError
 

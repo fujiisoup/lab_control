@@ -7,5 +7,6 @@ Currently, we support THR640.
 ```python
 from lab_control.spectrometer import thr640
 
-thr640.goto('/dev/USB0', 140000)
+spectrometer = thr640.THR640('/dev/USB0')
+spectrometer.goto(count=140000)
 ```

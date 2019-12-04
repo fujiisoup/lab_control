@@ -1,1 +1,1 @@
-from . import wavemeter
+from . import camera, spectrometer, wavemeter
