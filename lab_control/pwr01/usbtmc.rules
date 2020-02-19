@@ -1,0 +1,4 @@
+# USBTMC instruments
+# Kikusui Electronics Corp.
+SUBSYSTEMS=="usb", ACTION=="add", ATTRS{idVendor}=="0b3e", ATTRS{idProduct}=="10
+49", GROUP="usbtmc", MODE="0660"
