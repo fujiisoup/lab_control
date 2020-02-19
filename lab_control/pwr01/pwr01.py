@@ -27,26 +27,62 @@ class PWR01:
     def is_off(self):
         return not self.is_on
 
-    def output_on(self):
+    def output_on(self, max_time=None):
+        """
+        Turn the voltage / current on.
+        If max_time is not None, wait until it is actually on
+        """
         if self.is_off:
             self._instr.write("OUTP ON")
+        
+        if max_time is None:
+            return
+
+        start = time.time()
+        while self.is_off:
+            time.sleep(0.2)
+            if time.time() > start + max_time:
+                raise IOError('Cannot turn on.')
     
-    def output_off(self): 
+    def output_off(self, max_time=None): 
+        """
+        Turn the voltage / current off.
+        If max_time is not None, wait until it is actually off
+        """
         if self.is_on:
             self._instr.write("OUTP OFF")
 
+        if max_time is None:
+            return
+
+        start = time.time()
+        while self.is_on:
+            time.sleep(0.2)
+            if time.time() > start + max_time:
+                raise IOError('Cannot turn on.')
+    
     def set_current(self, value):
         """
         Set the constant current control
         """
-        self._instr.write("CURR {}".format(value))
+        self._instr.write("CURR:IMMediate {}".format(value))
+
+    def get_current(self):
+        """ Queries the measured value of the current.
+        """
+        return float(self._instr.ask("MEAS:CURR?"))
 
     def set_voltage(self, value):
         """
         Set the constant voltage control
         """
-        self._instr.write("VOLT {}".format(value))
+        self._instr.write("VOLT:IMM {}".format(value))
         
+    def get_voltage(self):
+        """ Queries the measured value of the voltage.
+        """
+        return float(self._instr.ask("MEAS:VOLT?"))
+
     def __del__(self):
         if self._instr is not None:
             self._instr.close()
