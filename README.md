@@ -1,17 +1,45 @@
 # Control scripts for experiment in Fujii team
 
-## Install
+## Installing USB-RS232C convertors
 
 In this scripts, we will use serial port.
-We need some drivers for it,
+We need some package and drivers for it,
+
+## Python packages
++ pyserial
+```
+conda install pyserial
+```
 
 ### Ubuntu
 Install [ftdi driver](https://www.ftdichip.com/Drivers/D2XX.htm)
 
 + libusb-1.0  `apt-get install libusb-1.0`
+
+#### With ftdi device
 + create `/etc/udev/rules.d/11-ftdi.rules`
 
-If you got an error, Permission denied, see https://stackoverflow.com/questions/27858041/oserror-errno-13-permission-denied-dev-ttyacm0-using-pyserial-from-pyth
+#### With PL2303 device
+Find the manufacturer ID and product ID 
+```bash
+lsusb
+```
+It shows something like the following
+
+> Bus 002 Device 005: ID 067b:2303 Prolific Technology, Inc. PL2303 Serial Port
+
+In this case, the manufacturer ID is 067b and product ID is 2303.
+
+Create a file `/etc/udev/rules.d/pl2303.rules` and add the following line
+
+```
+# PL2302 USB2.0-RS232 convertor
+SUBSYSTEMS=="usb", ACTION=="add", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="2303", GROUP="usbtmc", MODE="0660"
+```
+
+Then, restart.
+
+### Usage
 
 Find the COM port
 ```
@@ -24,8 +52,3 @@ Install [ftdi driver](https://www.ftdichip.com/Drivers/D2XX.htm)
 
 Find the COM port. It will look like `COM3`
 
-## Python packages
-+ pyserial
-```
-conda install pyserial
-```
