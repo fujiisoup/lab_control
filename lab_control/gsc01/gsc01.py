@@ -6,6 +6,9 @@ _WAIT_TIME = 0.3  # wait 3 second if not respond
 
 
 class GSC01:
+    """
+    High level functions for GSC01 by sigma koki.
+    """
     def __init__(self, port, timeout=10):
         self.port = port
         self.timeout = timeout
