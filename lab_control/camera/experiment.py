@@ -158,36 +158,8 @@ def repeat_move_and_shoot_with_shutter_control(start_count,count_interval,taken_
         start_count+=count_interval
         time.sleep(.5)
 
-
-## exposuretime 動かしながら撮影、bin,tempreture固定
-def shoot_and_update_exposure():
-    output_dir = r'C:\Users\Public\Documents\seminar\exposuretime'
-
-    ## 10ms~10e4msまで調べたい
-    bitween = 0.1
-    start = 0.9
-    for i in range(31):
-        start += bitween
-        fli.setExposureTime(int(10**start))
-        time.sleep(1)
-
-        # start exposure
-        fli.exposeFrame()
-        # exposure終わったらgrab
-        array = fli.grabFrame()
-        time.sleep(.1)
-        data = xr.DataArray(array, dims=['y', 'x'], coords={'exposure_time': int(10**start)}, 
-                            attrs={'temperature': fli.getTemperature(),
-                                'device_status': fli.getDeviceStatus(),
-                                'camera_mode': fli.getCameraModeString(0)
-                                })
-        file=r'\output'+ str(i)+'.nc'
-        data.to_netcdf(output_dir + file)
-        print(str(i) +'done')
-        time.sleep(2)
-
-
 if __name__ == "__main__":
+    print(fli)
     print(fli.getTemperature())
 
 
