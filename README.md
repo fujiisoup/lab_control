@@ -39,6 +39,27 @@ SUBSYSTEMS=="usb", ACTION=="add", ATTRS{idVendor}=="067b", ATTRS{idProduct}=="23
 
 Then, restart.
 
+
+### Windows
+
+#### Install python packages
+```python
+pip install hidapi
+pip install libusb1
+```
+
+### install binary snapshot for libusb1
+Download 
+libusb-1.0.dll
+from
+http://sourceforge.net/projects/libusb/files/
+and save it in 
+C:\Windows\System32
+
+See 
+https://github.com/libusb/libusb/wiki/Windows
+for the details.
+
 ### Usage
 
 Find the COM port
