@@ -16,11 +16,10 @@ logger = thr640.logger
 fli = FLI()
 wavelength_controller = thr640.THR640()
 
-"""
-一枚だけ撮影するときに使う
-"""
-def take_one_shoot(vbin,exposuretime,count,sleep):
+def take_one_shoot(vbin,exposuretime,count):
     """
+    コントローラを動かさず1枚撮影
+
     Parameters
     ----------
     vbin : int
@@ -30,14 +29,15 @@ def take_one_shoot(vbin,exposuretime,count,sleep):
         露光時間[ms]
 
     count : int
-        分光器の回折格子の座標
+        分光器の回折格子の現在の座標
 
     Returns
     -------
-    
+    data: xr.DataArray
+        撮影画像一枚
     """
-    temperature = fli.getTemperature()
-    # logger.info("カメラの温度: {}".format(fli.getTemperature()))
+    temperature = fli.getTemperature()　#xr.dataarrayのattrsに入れるのに必要
+
     fli.setExposureTime(exposuretime)
     fli.setVBin(vbin)
     fli.setImageArea(10,0,2058,512//vbin)
@@ -56,46 +56,35 @@ def take_one_shoot(vbin,exposuretime,count,sleep):
                             })
     return data
 
-"""
-撮影して回折格子動かす
-"""
-def move_and_shoot(count,exposure_time):
+
+def move_and_shoot(vbin,count,exposuretime):
+    """
+    回折格子動かして撮影
+
+    Parameters
+    ----------
+    vbin : int
+        縦のビニングサイズ
+
+    exposuretime: int
+        露光時間[ms]
+
+    count : int
+        分光器の回折格子の移動後の座標
+
+    Returns
+    -------
+    data: xr.DataArray
+        撮影画像一枚
+    """
+
+    # 移動
     wavelength_controller.goto(count=count)
     wavelength_controller.waitUntilReady()
-
-    # start exposure
-    fli.exposeFrame()
-    # exposure終わったらgrab
-    array = fli.grabFrame()
-    time.sleep(.5)
-
-    data = xr.DataArray(array, dims=['y', 'x'], coords={'spectrometer_count': count}, 
-                        attrs={'temperature': fli.getTemperature(),
-                               'device_status': fli.getDeviceStatus(),
-                               'camera_mode': fli.getCameraModeString(0),
-                               'exposure_time': exposure_time
-                               })
+    data = take_one_shoot(count=count,exposuretime=exposuretime,vbin= vbin)
     return data
 
-"""
-撮影して回折格子動かす(早いver)
-"""
-def fast_move_and_shoot(count,exposure_time):
-    wavelength_controller.goto(count=count)
 
-    # start exposure
-    fli.exposeFrame()
-    # exposure終わったらgrab
-    array = fli.grabFrame()
-    time.sleep(.5)
-
-    data = xr.DataArray(array, dims=['y', 'x'], coords={'spectrometer_count': count}, 
-                        attrs={'temperature': fli.getTemperature(),
-                               'device_status': fli.getDeviceStatus(),
-                               'camera_mode': fli.getCameraModeString(0),
-                               'exposure_time': exposure_time
-                               })
-    return data
 
 """
 撮影して回折格子動かすを繰り返す
@@ -157,9 +146,10 @@ def repeat_move_and_shoot_with_shutter_control(start_count,count_interval,taken_
         ## start_countあげて次のループへ
         start_count+=count_interval
         time.sleep(.5)
-
+        
 if __name__ == "__main__":
-    print(fli)
-    print(fli.getTemperature())
+    # コントローラに表示されている座標123456においてビニングサイズ4　露光時間1秒で撮影したい場合
+    move_and_shoot(vbin=4,exposuretime=1000,count=123456)
+
 
 
