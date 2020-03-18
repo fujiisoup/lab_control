@@ -1,0 +1,113 @@
+This covers the installation of the Finger Lakes Instrumentation SDK
+wrappers on Linux. Anyone who is able to modify things to work on Darwin or
+Windows is welcome to make a contribution.
+
+Linux Installation
+==================
+
+As currently configured a number of steps must be taken in order for pyfli
+to be installed and work properly.
+
+dependencies
+------------
+
+gcc compiler
+kernel headers -- for compiling the FLI usb driver
+python headers -- for compiling the python extension
+numpy -- numpy package
+
+The details of how to install the dependencies will vary from distro to
+distro, but they should all be available through the package manager.
+
+fliusb driver installation
+--------------------------
+
+Note that this needs to be done each time a new kernel is installed, which
+may be often in a distribution like Fedora. From inside the pyfli git
+repository the steps are
+
+cd fliusb-1.3
+make clean
+make
+sudo cp fliusb.ko /lib/modules/$(uname -r)/extra
+sudo depmod
+
+Once this is done the driver will be automatically loaded when a FLI usb
+device is plugged in. The module directory location used above works for my
+distribution, Fedora 17, it may need to be modified for other
+distributions. Note, Ubuntu uses 'misc' instead of 'extra'.
+
+udev configuration
+------------------
+
+The default permissions of the /dev/fliusb[0-9]* device node created when a
+FLI device is plugged in only allow root access. This may be changed and
+the device name customized by adding a rules script to /etc/udev/rules.d.
+An example script 10-local.rules.example can serve as a template for this,
+strip the '.example' extension, modify as needed, and do the copy. The
+results can be checked by plugging in a FLI device and looking at the
+permissions of the created /dev node. After installing the file it may be
+necessary to reload the rules.
+
+sudo udevadm control --reload-rules
+
+pyfli module installation
+-------------------------
+
+Do
+
+python setup.py build
+sudo python setup.py install
+
+or as I prefer
+
+python setup.py install --user
+
+
+Windows Installation
+====================
+
+dependencies
+------------
+
+The exact dependencies will vary a lot depending on the windows setup. It
+is probably easiest to use some standard package such as python(x,y) or the
+enthought distribution. I tested installation on Windows 7 using
+python(x,y). Python(x,y) comes with the mingw32 compiler along with numpy
+and a lot of other useful python packages. In any case, you will need all
+of the following in addition to the FLI usb drivers:
+
+compiler
+python
+numpy
+
+fliusb driver installation
+--------------------------
+
+The FLI drivers can be obtained by installing the FLI Software Installation
+Kit from  http://www.fli-cam.com/software/index.html. If you have a 64 bit
+OS, get the 64 bit version, and for a 32 bit OS the 32 bit version. That is
+independent of whether the installed python is 64 or 32 bit.
+
+pyfli module installation
+-------------------------
+
+Same as for Linux, from a console do
+
+python setup.py build
+sudo python setup.py install
+
+or as I prefer
+
+python setup.py install --user
+
+
+Macintosh installation
+======================
+
+The module compiles on Macintosh. You will need the xcode compilers, numpy,
+and python. The details will depend on the version of OSX, some of which
+are more troublesome than others. That is all moot, however, as no drivers
+are freely available. TheSkyX plugin from FLI probably has them, but it won't
+install anything without TheSkyX present. There is also some indication
+that libfli-1.104 is not up to date with regards to Darwin.
