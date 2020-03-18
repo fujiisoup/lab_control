@@ -5,8 +5,10 @@ Currently, we support THR640.
 ## Usage
 
 ```python
-from lab_control.spectrometer import THR640
+from spectrometer import thr640
 
-spectrometer = THR640('/dev/USB0')
-spectrometer.goto(count=140000)
+spectrometer = thr640.THR640()
+
+# gotoで行きたい座標に行く
+spectrometer.goto(count=10000)
 ```
