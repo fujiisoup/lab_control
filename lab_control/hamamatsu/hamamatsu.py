@@ -215,22 +215,6 @@ class HamamatsuCamera():
         """Sets the acquisition mode of the camera."""
         self.mode = mode
 
-    def settrigger(self, mode):
-        TRIGMODE = ctypes.c_int32(mode)
-        self.checkStatus(self.dcam.dcam_settriggermode(self.camera_handle, TRIGMODE), 'settriggermode')
-        DCAM_TRIGGERMODE = ctypes.c_int32(0)
-        self.checkStatus(self.dcam.dcam_gettriggermode(self.camera_handle, ctypes.byref(DCAM_TRIGGERMODE)),
-                         'gettrigermode')
-        return DCAM_TRIGGERMODE.value
-
-    def settrigger(self, mode):
-        TRIGMODE = ctypes.c_int32(mode)
-        self.checkStatus(self.dcam.dcam_settriggermode(self.camera_handle, TRIGMODE), 'settriggermode')
-        DCAM_TRIGGERMODE = ctypes.c_int32(0)
-        self.checkStatus(self.dcam.dcam_gettriggermode(self.camera_handle, ctypes.byref(DCAM_TRIGGERMODE)),
-                         'gettrigermode')
-        return DCAM_TRIGGERMODE.value
-
     def initCamera(self):
         #
         # Initialization
