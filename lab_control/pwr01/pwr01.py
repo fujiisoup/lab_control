@@ -1,28 +1,41 @@
 import usbtmc
+import usb.core
 import time
 
 
 # number of comunication trial
 NUM_COMUNICATE = 3
 
+
 class PWR01:
-    def __init__(self, venderID='0x0b3e', productID='0x1049'):
-        usb_id = "USB::{}::{}::INSTR".format(venderID, productID)
+    def __init__(self, vendorID="0x0b3e", productID="0x1049"):
+        usb_id = "USB::{}::{}::INSTR".format(vendorID, productID)
         self._instr = None
         for _ in range(NUM_COMUNICATE):
-            instr = usbtmc.Instrument("USB::0x0b3e::0x1049::INSTR")
+            try:
+                instr = usbtmc.Instrument(
+                    "USB::{}::{}::INSTR".format(vendorID, productID)
+                )
+            except usb.core.USBError:
+                instr = usbtmc.Instrument(
+                    usb.core.find(
+                        idVendor=int(vendorID, 16), idProduct=int(productID, 16)
+                    )
+                )
+                print(instr)
             try:
                 instr.ask("*IDN?")
                 self._instr = instr
-            except Exception:
+            except Exception as e:
+                print(e)
                 pass
         if self._instr is None:
-            raise IOError('Instrument is not found in {}.'.format(usb_id))
+            raise IOError("Instrument is not found in {}.".format(usb_id))
 
     @property
     def is_on(self):
-        return self._instr.ask("OUTP?") == '1'
-    
+        return self._instr.ask("OUTP?") == "1"
+
     @property
     def is_off(self):
         return not self.is_on
@@ -34,7 +47,7 @@ class PWR01:
         """
         if self.is_off:
             self._instr.write("OUTP ON")
-        
+
         if max_time is None:
             return
 
@@ -42,9 +55,9 @@ class PWR01:
         while self.is_off:
             time.sleep(0.2)
             if time.time() > start + max_time:
-                raise IOError('Cannot turn on.')
-    
-    def output_off(self, max_time=None): 
+                raise IOError("Cannot turn on.")
+
+    def output_off(self, max_time=None):
         """
         Turn the voltage / current off.
         If max_time is not None, wait until it is actually off
@@ -59,8 +72,8 @@ class PWR01:
         while self.is_on:
             time.sleep(0.2)
             if time.time() > start + max_time:
-                raise IOError('Cannot turn on.')
-    
+                raise IOError("Cannot turn on.")
+
     def set_current(self, value):
         """
         Set the constant current control
@@ -77,7 +90,7 @@ class PWR01:
         Set the constant voltage control
         """
         self._instr.write("VOLT:IMM {}".format(value))
-        
+
     def get_voltage(self):
         """ Queries the measured value of the voltage.
         """
