@@ -616,13 +616,13 @@ class HamamatsuCamera():
         else:
             self.setPropertyValue("subarray_mode", 2)  # ON
 
-    def startAcquisition(self):
+    def startAcquisition(self, buffer_time=2.0):
         """ Start data acquisition."""
         self.captureSetup()
 
         # Allocate Hamamatsu image buffers.
         # We allocate enough to buffer 2 seconds of data.
-        n_buffers = int(2.0 * self.getPropertyValue("internal_frame_rate")[0])
+        n_buffers = int(buffer_time * self.getPropertyValue("internal_frame_rate")[0])
         self.number_image_buffers = n_buffers
         self.checkStatus(self.dcam.dcam_allocframe(self.camera_handle,
                                                    ctypes.c_int32(self.number_image_buffers)),
@@ -722,25 +722,25 @@ class HamamatsuCameraMR(HamamatsuCamera):
         # We need to attach & release for each acquisition otherwise
         # we'll get an error if we try to change the ROI in any way
         # between acquisitions.
-        self.checkStatus(dcam.dcam_attachbuffer(self.camera_handle,
+        self.checkStatus(self.dcam.dcam_attachbuffer(self.camera_handle,
                                                 self.hcam_ptr,
                                                 ctypes.sizeof(self.hcam_ptr)),
                          "dcam_attachbuffer")
 
         # Start acquisition.
-        self.checkStatus(dcam.dcam_capture(self.camera_handle),
+        self.checkStatus(self.dcam.dcam_capture(self.camera_handle),
                          "dcam_capture")
 
     def stopAcquisition(self):
         """Stops the acquisition and releases the memory associated with the frames."""
 
         # Stop acquisition.
-        self.checkStatus(dcam.dcam_idle(self.camera_handle),
+        self.checkStatus(self.dcam.dcam_idle(self.camera_handle),
                          "dcam_idle")
 
         # Release image buffers.
         if (self.hcam_ptr):
-            self.checkStatus(dcam.dcam_releasebuffer(self.camera_handle),
+            self.checkStatus(self.dcam.dcam_releasebuffer(self.camera_handle),
                              "dcam_releasebuffer")
 
         print("max camera backlog was: %s" % self.max_backlog)

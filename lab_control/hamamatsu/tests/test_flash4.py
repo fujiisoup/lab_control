@@ -1,9 +1,13 @@
+import time
 from .. import flash4
 
 
-def _test_cooler():
+def test_cooler():
     camera = flash4.Flash4(0)
-    camera.setCoolerOff()
+    # assert camera.isCoolerOn
+    props = camera.getCameraProperties() 
+    assert camera.isCoolerOn
+    camera.shutdown()
     
 def test_exposure_time():
     camera = flash4.Flash4(0)
@@ -12,3 +16,14 @@ def test_exposure_time():
         print(camera.getPropertyText(key))
 
     camera.setExposureTime(0.01)
+    camera.shutdown()
+
+def test_shoot():
+    camera = flash4.Flash4(0)
+    for frame, exposure in [(2, 0.02), (2, 1.2), (150, 0.01)]:
+        start = time.time()
+        data = camera.shoot(frame, exposure)
+        stop = time.time()
+        assert len(data) == frame
+        assert stop - start < (frame * (exposure + 0.03) + 1.0)
+    camera.shutdown()
