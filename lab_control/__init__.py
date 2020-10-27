@@ -12,3 +12,6 @@ try:
     from .pwr01 import pwr01
 except ImportError:
     pass
+
+
+from . import hamamatsu
