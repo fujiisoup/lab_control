@@ -1,16 +1,16 @@
 import time
-from .. import flash4
+from lab_control import hamamatsu
 
 
 def test_cooler():
-    camera = flash4.Flash4(0)
+    camera = hamamatsu.Flash4(0)
     # assert camera.isCoolerOn
     props = camera.getCameraProperties() 
     assert camera.isCoolerOn
     camera.shutdown()
     
 def test_exposure_time():
-    camera = flash4.Flash4(0)
+    camera = hamamatsu.Flash4(0)
     for key, item in camera.getCameraProperties().items():
         print(key, item, camera.getPropertyValue(key))
         print(camera.getPropertyText(key))
@@ -19,7 +19,7 @@ def test_exposure_time():
     camera.shutdown()
 
 def test_shoot():
-    camera = flash4.Flash4(0)
+    camera = hamamatsu.Flash4(0)
     for frame, exposure in [(2, 0.02), (2, 1.2), (150, 0.01)]:
         start = time.time()
         data = camera.shoot(frame, exposure)
