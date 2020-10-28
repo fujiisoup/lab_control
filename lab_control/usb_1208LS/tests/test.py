@@ -35,6 +35,7 @@ def test_AInScan():
     print('scan ',i, end=' ')
     for j in range(4):
       print(format(device.volts(gain,value[4*i+j]),'.2f'),end=' ')
+  raise ValueError
 
 def testAout():
   device = usb_1208LS()

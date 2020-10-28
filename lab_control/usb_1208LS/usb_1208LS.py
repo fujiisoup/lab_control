@@ -18,7 +18,12 @@
 import hid
 import time
 from struct import *
+import os
 from .mccUSB import *
+
+
+# If windows, it looks that we need to pass reverse order in write
+SLICE = slice(None, None, -1) if os.name == 'nt' else slice(None)
 
 class usb_1208(mccUSB):
 
@@ -113,7 +118,7 @@ class usb_1208(mccUSB):
 
     if self.productID == 0x0075 and port_number == self.DIO_AUXPORT:
       bit_mask = ((bit_mask ^ 0xff) & 0xff)
-    self.h.write([self.DCONFIG, port_number, bit_mask, 0, 0, 0, 0, 0])
+    self.h.write([self.DCONFIG, port_number, bit_mask, 0, 0, 0, 0, 0][SLICE])
 
   def DIn(self, port_number):
     '''
@@ -127,7 +132,7 @@ class usb_1208(mccUSB):
     Bug: need leading 0 in command string.
     '''
 
-    self.h.write([0x0, self.DIN, port_number, 0, 0, 0, 0, 0, 0])
+    self.h.write([0x0, self.DIN, port_number, 0, 0, 0, 0, 0, 0][SLICE])
     try:
       value = self.h.read(8,500)
     except:
@@ -143,7 +148,7 @@ class usb_1208(mccUSB):
                      Port B     =   0x04
      value:           value to write to the port
     '''
-    self.h.write([self.DOUT, port_number, value, 0, 0, 0, 0, 0])
+    self.h.write([self.DOUT, port_number, value, 0, 0, 0, 0, 0][SLICE])
 
   def DBitIn(self, port_number, bit):
     '''
@@ -157,7 +162,7 @@ class usb_1208(mccUSB):
      bit:            The bit to read (0-7)
     '''
     
-    self.h.write([self.DBIT_IN, port_number, bit, 0, 0, 0, 0, 0])
+    self.h.write([self.DBIT_IN, port_number, bit, 0, 0, 0, 0, 0][SLICE])
     try:
       value = self.h.read(1,500)
     except:
@@ -175,7 +180,7 @@ class usb_1208(mccUSB):
      bit:            The bit to read (0-7)
      value:          The value to write to the bit (0 or 1)
     '''
-    self.h.write([self.DBIT_OUT, port_number, bit, value, 0, 0, 0, 0])
+    self.h.write([self.DBIT_OUT, port_number, bit, value, 0, 0, 0, 0][SLICE])
     
   #################################
   #    Analog Input  Commands     #
@@ -205,7 +210,7 @@ class usb_1208(mccUSB):
       print('AIn: channel out of range for single ended mode.')
       return -1
 
-    self.h.write([self.AIN, channel, gain, 0, 0, 0, 0, 0])
+    self.h.write([self.AIN, channel, gain, 0, 0, 0, 0, 0][SLICE])
     try:
       data = self.h.read(3, 100)
     except:
@@ -277,7 +282,7 @@ class usb_1208(mccUSB):
     # Load the AIn Scan Queue
     self.ALoadQueue(nQueue, chanQueue, gainQueue)
 
-    self.h.write([self.AIN_SCAN, count & 0xff, (count>>8) & 0xff, preload,  prescale, options, 0, 0])
+    self.h.write([self.AIN_SCAN, count & 0xff, (count>>8) & 0xff, preload,  prescale, options, 0, 0][SLICE])
 
     # If in external trigger mode, then wait for the device to send back notice
     # that the trigger has been received, then startup the acquisition
@@ -338,7 +343,7 @@ class usb_1208(mccUSB):
     '''
     This command stops the analog scan (if running)
     '''
-    self.h.write([self.AIN_STOP, 0, 0, 0, 0, 0, 0, 0])
+    self.h.write([self.AIN_STOP, 0, 0, 0, 0, 0, 0, 0][SLICE])
 
   def ALoadQueue(self, count, chanQueue, gainQueue):
     # count must be 1, 2, 4 or 8
@@ -348,11 +353,11 @@ class usb_1208(mccUSB):
                                              chanQueue[2] & 0x7 | gainQueue[2] | 0x80, \
                                              chanQueue[3] & 0x7 | gainQueue[3] | 0x80, \
                                              chanQueue[4] & 0x7 | gainQueue[4] | 0x80, \
-                                             chanQueue[5] & 0x7 | gainQueue[5] | 0x80])
+                                             chanQueue[5] & 0x7 | gainQueue[5] | 0x80][SLICE])
 
     if (count == 8): # configure the rest of the channels (channel 6 and 7)
       self.h.write([self.ALOAD_QUEUE, 0x2, chanQueue[6] & 0x7 | gainQueue[6] | 0x80, \
-                                           chanQueue[7] & 0x7 | gainQueue[7] | 0x80, 0, 0, 0, 0])
+                                           chanQueue[7] & 0x7 | gainQueue[7] | 0x80, 0, 0, 0, 0][SLICE])
   
 
   #################################
@@ -374,7 +379,7 @@ class usb_1208(mccUSB):
     if (channel < 0 or channel > 1):
       print('AOut: channel out of range.')
       return
-    self.h.write([self.AOUT, channel, (value&0xff), (value>>8)&0xff, 0, 0, 0, 0])
+    self.h.write([self.AOUT, channel, (value&0xff), (value>>8)&0xff, 0, 0, 0, 0][SLICE])
 
   #################################
   #     Counter  Commands         #
@@ -387,7 +392,7 @@ class usb_1208(mccUSB):
     the CTR pin (pin 20) on the screw terminal of the device.
     '''
     
-    self.h.write([self.CIN, 0, 0, 0, 0, 0, 0, 0])
+    self.h.write([self.CIN, 0, 0, 0, 0, 0, 0, 0][SLICE])
     try:
       value = self.h.read(4,100)
     except:
@@ -399,7 +404,7 @@ class usb_1208(mccUSB):
     ''' 
     This command initializes the event counter and resets the count to zero
     '''
-    self.h.write([self.CINIT, 0, 0, 0, 0, 0, 0, 0])
+    self.h.write([self.CINIT, 0, 0, 0, 0, 0, 0, 0][SLICE])
 
   #################################
   #     Memory  Commands          #
@@ -430,7 +435,7 @@ class usb_1208(mccUSB):
     if (count > 8):
       print('MemRead: max count is 8')
       return
-    self.h.write([self.MEM_READ, address, count, 0, 0, 0, 0, 0])
+    self.h.write([self.MEM_READ, address, count, 0, 0, 0, 0, 0][SLICE])
     try:
       value = self.h.read(count, 100)
     except:
@@ -465,7 +470,7 @@ class usb_1208(mccUSB):
     if (count > 4):
       print('MemWrite: max count is 4')
       return
-    self.h.write([self.MEM_WRITE, address, count, data[0:count]] + [0]*(5-count))
+    self.h.write(([self.MEM_WRITE, address, count, data[0:count]] + [0]*(5-count))[SLICE])
 
 
   #################################
@@ -476,7 +481,7 @@ class usb_1208(mccUSB):
     '''
      This command causes the LED to flash several times.
     '''
-    self.h.write([self.BLINK_LED, 0, 0, 0, 0, 0, 0, 0])
+    self.h.write([self.BLINK_LED, 0, 0, 0, 0, 0, 0, 0][SLICE])
 
   def Reset(self):
     '''
@@ -484,7 +489,7 @@ class usb_1208(mccUSB):
     simulates a disconnect from the USB bus which in turn causes the
     host computer to re-enumerate the device.
     '''
-    self.h.write([self.RESET, 0, 0, 0, 0, 0, 0, 0])
+    self.h.write([self.RESET, 0, 0, 0, 0, 0, 0, 0][SLICE])
 
   def SetTrigger(self, type, chan=0):
     '''
