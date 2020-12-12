@@ -1,6 +1,5 @@
 # A wrapper of usb_1208LS.py
 import numpy as np
-from . import usb_1208LS
 
 
 try:
@@ -8,8 +7,14 @@ try:
     from mcculw.enums import ULRange
     from mcculw.ul import ULError
     HAS_MCCULW = True
+except OSError as e:
+    raise ImportError(e)
 except ImportError:
+    from . import usb_1208LS
     HAS_MCCULW = False
+
+
+NUM_TRIAL = 5
 
 
 class usb_1208LS:
@@ -28,10 +33,15 @@ class usb_1208LS:
         """
         if ch not in range(8):
             raise ValueError('Invalid channel: {}'.format(ch))
-        ai_range = ULRange.BIP2PT5VOLTS
-        return ul.to_eng_units(
-            self.board_num,
-            ai_range, ul.a_in(self.board_num, ch, ai_range))
+        ai_range = ULRange.BIP10VOLTS
+        for trial in range(NUM_TRIAL):
+            try:
+                return ul.to_eng_units(
+                    self.board_num,
+                    ai_range, ul.a_in(self.board_num, ch, ai_range))
+            except ULError as e:
+                if trial == NUM_TRIAL - 1:
+                    raise e
 
     def AIn_differential(self, ch, gain):
         """
@@ -54,7 +64,10 @@ class usb_1208LS:
 
         ao_range = ULRange.UNI5VOLTS
         value = ul.from_eng_units(self.board_num, ao_range, value)
-        ul.a_out(self.board_num, ch, ao_range, value)
         
-    def __del__(self):
-        self.h.close()
+        for trial in range(NUM_TRIAL):
+            try:
+                ul.a_out(self.board_num, ch, ao_range, value)
+            except ULError as e:
+                if trial == NUM_TRIAL - 1:
+                    raise e
