@@ -1,5 +1,6 @@
 # A wrapper of usb_1208LS.py
 import numpy as np
+import time
 
 
 try:
@@ -14,7 +15,7 @@ except ImportError:
     HAS_MCCULW = False
 
 
-NUM_TRIAL = 5
+NUM_TRIAL = 128
 
 
 class usb_1208LS:
@@ -42,6 +43,8 @@ class usb_1208LS:
             except ULError as e:
                 if trial == NUM_TRIAL - 1:
                     raise e
+                print('waiting for ADC')
+                time.sleep(0.1)
 
     def AIn_differential(self, ch, gain):
         """
@@ -71,3 +74,5 @@ class usb_1208LS:
             except ULError as e:
                 if trial == NUM_TRIAL - 1:
                     raise e
+                print('waiting for ADC')
+                time.sleep(0.1)
