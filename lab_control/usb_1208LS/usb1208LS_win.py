@@ -28,7 +28,7 @@ class usb_1208LS:
         """
         if ch not in range(8):
             raise ValueError('Invalid channel: {}'.format(ch))
-        ai_range = ULRange.BIP10VOLTS
+        ai_range = ULRange.BIP2PT5VOLTS
         return ul.to_eng_units(
             self.board_num,
             ai_range, ul.a_in(self.board_num, ch, ai_range))
@@ -52,7 +52,7 @@ class usb_1208LS:
         if value < 0.0 or value > 5.0:
             raise ValueError('Output should be in 0--5 V')
 
-        ao_range = ULRange.BIP5VOLTS
+        ao_range = ULRange.UNI5VOLTS
         value = ul.from_eng_units(self.board_num, ao_range, value)
         ul.a_out(self.board_num, ch, ao_range, value)
         

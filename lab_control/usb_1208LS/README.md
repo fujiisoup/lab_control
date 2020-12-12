@@ -31,6 +31,7 @@ pip install libusb1
 
 # Windows installation
 
+In windows, mcculw is necessary to be installed.
 ```
 pip mcculw
 ```
