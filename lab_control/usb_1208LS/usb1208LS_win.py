@@ -4,7 +4,7 @@ from . import usb_1208LS
 
 
 try:
-    import mcculw
+    from mcculw import ul
     from mcculw.enums import ULRange
     from mcculw.ul import ULError
     HAS_MCCULW = True
@@ -18,13 +18,20 @@ class usb_1208LS:
             raise ImportError(
                 'mcculw is necessary to drive usb_1208LS in windows. '
                 'do "pip install mcculw"')
+        # TODO maybe there will be more than one board.
+        self.board_num = 0 
 
     def AIn_single_ended(self, ch):
         """
         Analog input with single-ended configuration.
         ch must be one of 0 ~ 7
         """
-        raise NotImplementedError
+        if ch not in range(8):
+            raise ValueError('Invalid channel: {}'.format(ch))
+        ai_range = ULRange.BIP10VOLTS
+        return ul.to_eng_units(
+            self.board_num,
+            ai_range, ul.a_in(self.board_num, ch, ai_range))
 
     def AIn_differential(self, ch, gain):
         """
@@ -33,27 +40,6 @@ class usb_1208LS:
         Gain must be one of [1.0, 1.25, 2.0, 2.5, 4.0, 5.0, 10.0, 20.0]
         """
         raise NotImplementedError
-        if gain <= 1.0:
-            gain = self.BP_1_00V
-        elif gain <= 1.25:
-            gain = self.BP_1_25V
-        elif gain <= 2.0:
-            gain = self.BP_2_00V
-        elif gain <= 2.5:
-            gain = self.BP_2_50V
-        elif gain <= 4.0:
-            gain = self.BP_4_00V
-        elif gain <= 5.0:
-            gain = self.BP_5_00V
-        elif gain <= 10.0:
-            gain = self.BP_10_00V
-        elif gain <= 20.0:
-            gain = self.BP_20_00V
-        else:
-            raise ValueError('gain must be in one of [1.0, 1.25, 2.0, 2.5, 4.0, 5.0, 10.0, 20.0].' + 
-                             'given {}.'.format(gain))
-        value = self.AIn(ch, gain)
-        return self.volts(gain, value)
 
     def AO(self, ch, value):
         """
@@ -61,8 +47,14 @@ class usb_1208LS:
         ch should be one of 0 or 1
         value should be within 0 ~ 5 V.
         """
-        volt = int(value / 5.0 * 0x3ff)
-        self.AOut(0, volt)
+        if ch not in range(2):
+            raise ValueError('Invalid channel: {}'.format(ch))
+        if value < 0.0 or value > 5.0:
+            raise ValueError('Output should be in 0--5 V')
+
+        ao_range = ULRange.BIP5VOLTS
+        value = ul.from_eng_units(self.board_num, ao_range, value)
+        ul.a_out(self.board_num, ch, ao_range, value)
         
     def __del__(self):
         self.h.close()
