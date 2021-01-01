@@ -13,5 +13,9 @@ try:
 except ImportError:
     pass
 
+try:
+    from .gsc01 import GSC01
+except ImportError:
+    pass
 
 from . import hamamatsu

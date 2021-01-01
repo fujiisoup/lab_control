@@ -21,13 +21,16 @@ class GSC01:
     def wait_until_ready(self, timeout=10):
         wait_until_ready(self.port, timeout)
 
-    def move_relative(self, pulse):
+    def move_relative(self, pulses):
         move_relative(pulses, self.port, self.timeout)
         self.wait_until_ready(timeout=60)
     
     def move_absolute(self, pulses):
         move_absolute(pulses, self.port, self.timeout)
         self.wait_until_ready(timeout=60)
+
+    def current_position(self):
+        return current_position(self.port, timeout=self.timeout)
 
     def set_speed(self, 
         minimum_speed=500, maximum_speed=5000, acceleration=200, 
@@ -113,6 +116,7 @@ def set_origin(port, timeout=10):
         if res != 'OK':
             raise IOError('Communication with {} failed.'.format(port))
 
+<<<<<<< HEAD
 def set_speed(
     port, 
     minimum_speed=500, maximum_speed=5000, acceleration=200, 
@@ -135,3 +139,10 @@ def set_speed(
         if res != 'OK':
             raise IOError('Communication with {} failed.'.format(port))
 
+=======
+def current_position(port, timeout=10):
+    with serial.Serial(port, timeout=timeout) as ser:
+        ser.write('Q:\r\n'.encode())
+        res = ser.readline().decode('utf8').strip()
+        return int(res.split(',')[0])
+>>>>>>> master
