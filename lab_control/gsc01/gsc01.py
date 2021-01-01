@@ -116,7 +116,6 @@ def set_origin(port, timeout=10):
         if res != 'OK':
             raise IOError('Communication with {} failed.'.format(port))
 
-<<<<<<< HEAD
 def set_speed(
     port, 
     minimum_speed=500, maximum_speed=5000, acceleration=200, 
@@ -139,10 +138,8 @@ def set_speed(
         if res != 'OK':
             raise IOError('Communication with {} failed.'.format(port))
 
-=======
 def current_position(port, timeout=10):
     with serial.Serial(port, timeout=timeout) as ser:
         ser.write('Q:\r\n'.encode())
         res = ser.readline().decode('utf8').strip()
         return int(res.split(',')[0])
->>>>>>> master
