@@ -28,3 +28,10 @@ Do not forget to add the user to group `mcc`.
 pip install hidapi
 pip install libusb1
 ```
+
+# Windows installation
+
+In windows, mcculw is necessary to be installed.
+```
+pip mcculw
+```

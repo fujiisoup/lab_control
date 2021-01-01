@@ -3,6 +3,15 @@ from .. import usb_1208LS
 import time
 
 
+try:
+    import mcculw
+    IS_WINDOWS = True
+except ImportError:
+    IS_WINDOWS = False
+
+
+@pytest.mark.skipif(
+  IS_WINDOWS, reason="Not yet fully implemented in windows")
 def test_Ai():
   device = usb_1208LS()
   # ch 0, 1, ..., single ended  
@@ -19,6 +28,15 @@ def test_Ai():
   val = device.AIn_differential(0, 10.0)
   assert isinstance(val, float)
 
+
+def test_Ai_singleend():
+  device = usb_1208LS()
+  val = device.AIn_single_ended(0)
+  assert isinstance(val, float)
+
+
+@pytest.mark.skipif(
+  IS_WINDOWS, reason="Not yet fully implemented in windows")
 def test_AInScan():
   device = usb_1208LS()
 
@@ -35,11 +53,13 @@ def test_AInScan():
     print('scan ',i, end=' ')
     for j in range(4):
       print(format(device.volts(gain,value[4*i+j]),'.2f'),end=' ')
+  raise ValueError
 
 def testAout():
   device = usb_1208LS()
-  device.AOut(0, 0x300)
-  device.AOut(1, 0x300)
+  if not IS_WINDOWS:
+    device.AOut(0, 0x300)
+    device.AOut(1, 0x300)
 
   device.AO(0, 3.0)
   device.AO(0, 5.0)
