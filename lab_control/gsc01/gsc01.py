@@ -131,7 +131,7 @@ def set_speed(
     acceleration time in [ms]
     """
     with serial.Serial(port, timeout=timeout) as ser:
-        ser.write('D:S{}F{}R{}\r\n'.format(
+        ser.write('D:1S{}F{}R{}\r\n'.format(
             int(minimum_speed), int(maximum_speed), int(acceleration)
         ).encode())
         res = ser.readline().decode('utf8').strip()
