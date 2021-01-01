@@ -32,6 +32,24 @@ class GSC01:
     def current_position(self):
         return current_position(self.port, timeout=self.timeout)
 
+    def set_speed(self, 
+        minimum_speed=500, maximum_speed=5000, acceleration=200, 
+        timeout=10
+    ):
+        """
+        Set speed parameters
+
+        Parameters
+        ----------
+        minimum speed in [pps]
+        maximum speed in [pps]
+        acceleration time in [ms]
+        """
+        set_speed(
+            self.port, minimum_speed=minimum_speed, maximum_speed=maximum_speed,
+            acceleration=acceleration, timeout=timeout
+        )
+
 
 def return_to_origin(port='/dev/ttyUSB0', timeout=10):
     """
@@ -94,6 +112,28 @@ def move_absolute(pulses, port='/dev/ttyUSB0', timeout=10):
 def set_origin(port, timeout=10):
     with serial.Serial(port, timeout=timeout) as ser:
         ser.write('R:1\r\n'.encode())
+        res = ser.readline().decode('utf8').strip()
+        if res != 'OK':
+            raise IOError('Communication with {} failed.'.format(port))
+
+def set_speed(
+    port, 
+    minimum_speed=500, maximum_speed=5000, acceleration=200, 
+    timeout=10
+):
+    """
+    Set speed parameters
+
+    Parameters
+    ----------
+    minimum speed in [pps]
+    maximum speed in [pps]
+    acceleration time in [ms]
+    """
+    with serial.Serial(port, timeout=timeout) as ser:
+        ser.write('D:1S{}F{}R{}\r\n'.format(
+            int(minimum_speed), int(maximum_speed), int(acceleration)
+        ).encode())
         res = ser.readline().decode('utf8').strip()
         if res != 'OK':
             raise IOError('Communication with {} failed.'.format(port))
