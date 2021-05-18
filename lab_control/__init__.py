@@ -13,8 +13,9 @@ try:
 except ImportError:
     pass
 
-try:
+try:  # they required pyserial only
     from .gsc01 import GSC01
+    from . import sus
 except ImportError:
     pass
 
