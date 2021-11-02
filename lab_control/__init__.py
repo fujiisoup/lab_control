@@ -19,4 +19,7 @@ try:  # they required pyserial only
 except ImportError:
     pass
 
-from . import hamamatsu
+try:
+    from . import hamamatsu
+except ImportError:
+    pass
