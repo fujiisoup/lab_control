@@ -38,3 +38,25 @@ For the details, see
 http://alexforencich.com/wiki/en/python-usbtmc/readme
 
 
+
+## using in Windows
+
+### Requirement
+
++ python-usbtmc  
+```
+pip install python-usbtmc
+```
+
++ pyusb
+```
+pip install pyusb
+```
+
+### preparation
+
+Download Zadig from
+http://zadig.akeo.ie/
+and execute Zadig
+
+Choose libusb-win32(vX.X.X.X) in Zadig, then install
