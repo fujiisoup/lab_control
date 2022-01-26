@@ -2,6 +2,10 @@
 Tested with STC-MBS500U3V
 
 This is a thin wrapper of *Harvester*
+Only very limited features are implemented.
+
+## Preparation
+
 - Install the SDK  
 https://industrial.omron.eu/en/products/STC-MBS500U3V#software
 

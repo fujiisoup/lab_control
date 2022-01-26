@@ -23,3 +23,8 @@ try:
     from . import hamamatsu
 except ImportError:
     pass
+
+try:
+    from . import sentech
+except ImportError:
+    pass
