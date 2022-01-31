@@ -142,7 +142,7 @@ class SentechCamera:
                     data_format = component.data_format
 
                     # Reshape the image so that it can be drawn on the VisPy canvas:
-                    content.append(component.data.reshape(height, width))
+                    content.append(np.copy(component.data.reshape(height, width)))
                     timestamps.append(buffer.timestamp_ns)
             ia.stop_acquisition()
 

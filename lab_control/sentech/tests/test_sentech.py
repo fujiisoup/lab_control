@@ -26,6 +26,7 @@ def test_shoot_xr():
 def test_shoot_exposure():
     camera = SentechCamera(0)
     images = camera.shoot(3, 0.1, return_xr=True)
+    assert not np.allclose(images, 0)
     assert np.allclose(np.diff(images['time'].values), 0.1, rtol=1e-4)
 
     images = camera.shoot(3, 0.3, return_xr=True)
