@@ -15,7 +15,7 @@ def _default_cti_filepath():
     # its win32, maybe there is win64 too?
     is_windows = sys.platform.startswith('win')
     if is_windows:
-        raise NotImplementedError()
+        return "C:/Program Files/Common Files/OMRON_SENTECH/GenTL/v1_5/StGenTL_MD_VC141_v1_5.cti" 
     # linux
     return "/opt/sentech/lib/libstgentl.cti"
 
